@@ -1,0 +1,162 @@
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+
+public class DrawGrid {
+    private JFrame frame;
+
+    public DrawGrid() {
+        frame = new JFrame("DrawGrid");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setPreferredSize(frame.getSize());
+        frame.add(new MultiDraw(frame.getSize()));
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public static void main(String... argv) {
+        new DrawGrid();
+    }
+
+    public static class MultiDraw extends JPanel  implements MouseListener {
+        // class variables to draw the gris and control the colors
+        int startX = 10;
+        int startY = 10;
+        int Cellwidth = 40;
+        int turn = 2;
+        int rows = 6;
+        int cols = 7;
+        
+        
+
+        Color[][] grid = new Color[rows][cols];
+
+        public MultiDraw(Dimension dimension) {
+            setSize(dimension);
+            setPreferredSize(dimension);
+            addMouseListener(this);
+            //1. initialize array here
+            int x = 0;
+            for (int row = 0; row < grid.length; row++) {
+                for (int col = 0; col < grid[0].length; col++) {
+                   grid[row][col] = new Color(100,255,100);
+                   
+                }
+              
+            }
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D)g;
+            Dimension d = getSize();
+            startX = 0;
+            startY = 0;
+            
+            
+            //2) draw grid here
+            g2.setColor(Color.black);
+            g2.fillRect(0,0, d.width, d.height);
+            
+            g2.setColor(new Color(191,195,188));
+            g2.fillRect(0, 240, 280, 160);
+            
+            // to draw teh circles 6 by 7
+            
+            for (int row = 0; row < grid.length; row++) {
+                for (int col = 0; col < grid[0].length; col++) {
+                    
+                   
+                    
+                   g2.setColor(grid[row][col]);
+                   g2.fillOval(startX, startY, Cellwidth, Cellwidth);
+                   startX = startX + Cellwidth;
+                                     
+                }
+              startX = 0;
+              startY = startY + Cellwidth;
+            }
+            // to inform teh player of how to refresh
+            g2.setColor(Color.black);
+            g2.drawString("Refresh by clicking this area",80 ,300);
+            
+            // to inform the player of the color's turn
+            if(turn%2==0){
+            g2.setColor(Color.red);
+            g2.drawString("Red's Turn",400,190);
+            }else{
+            g2.setColor(Color.yellow);
+            g2.drawString("Yellow's Turn", 400, 190);
+            }
+            
+        }
+        
+          public void mousePressed(MouseEvent e) {
+              // variables to control teh change of color
+               int x = e.getX();
+               int y = e.getY();
+               int xspot = x/Cellwidth;
+               int yspot = y/Cellwidth;
+               //if/else statement to prevent the appearance of errors when clicked out of the grid
+               if (yspot<=rows-1 && xspot<=cols-1){
+               yspot = CheckForOpenSpot(xspot);
+               //to prevetn errors
+               if (yspot<0){
+                System.out.println("Invalid Spot");                     
+            }else{
+                // to change teh oval's color
+              if(turn%2==0){
+               grid[yspot][xspot] = new Color(255, 0, 0);
+            }
+              else{
+               grid[yspot][xspot] = new Color(255, 255,0);
+            }
+            
+            turn++;}
+            // to make teh palyer refresh
+            }else if (x<280 && y>240){
+                for (int row = 0; row < grid.length; row++) {
+                for (int col = 0; col < grid[0].length; col++) {
+                   grid[row][col] = new Color(100,255,100);
+                   
+                }
+              
+            }
+            }
+        repaint();}
+           // a method to check for open spots in a colums when it's clicked in order to make teh colors stack on top of each other
+         public int CheckForOpenSpot(int xspot){
+            int yspot = rows-1;
+            while(!(grid[yspot][xspot].equals (new Color(100,255,100)) || yspot<0)){
+             yspot--;
+            }
+            return yspot;
+         }
+                
+     
+    public void mouseReleased(MouseEvent e) {
+           
+       }
+    
+     
+    public void mouseEntered(MouseEvent e) {
+       
+    }
+     
+    public void mouseExited(MouseEvent e) {
+       
+    }
+     
+    public void mouseClicked(MouseEvent e) {
+        
+    }
+    }
+}
